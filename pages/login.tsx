@@ -1,6 +1,10 @@
 import { getProviders, signIn } from 'next-auth/react'
 
-export default function Login({ providers }) {
+interface ILoginProvider {
+  id: string
+  name: string
+}
+export default function Login({ providers }: { providers: ILoginProvider[] }) {
   return (
     <div className="flex min-h-screen w-full flex-col items-center justify-center bg-black">
       <img
@@ -8,8 +12,7 @@ export default function Login({ providers }) {
         src="https://links.papareact.com/9xl"
         alt="spotify logo"
       />
-
-      {Object.values(providers).map((provider) => (
+      {Object.values(providers)?.map((provider: ILoginProvider) => (
         <div key={provider.name}>
           <button
             className="rounded-full bg-[#18D860] p-5 text-white"
