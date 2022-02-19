@@ -1,7 +1,11 @@
 import { ChevronDownIcon } from '@heroicons/react/outline'
 import { shuffle } from 'lodash'
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import { playlistIdState, playlistState } from '../atoms/playlistAtom'
+import { useSpotify } from '../hooks/useSpotify'
+import Songs from './Songs'
 
 const colors = [
   'from-indigo-500',
@@ -13,21 +17,34 @@ const colors = [
   'from-purple-500',
 ]
 
-export const Center = () => {
+export default function Center() {
   const { data: session } = useSession()
+  const spotifyApi = useSpotify()
   const [color, setColor] = useState<string>('')
+  const playlistId = useRecoilValue<string>(playlistIdState)
+  const [playlist, setPlaylist] =
+    useRecoilState<SpotifyApi.SinglePlaylistResponse>(playlistState)
 
   useEffect(() => {
     const randomColor = shuffle(colors)?.pop() as string
     setColor(randomColor)
-  }, [])
+  }, [playlistId])
+
+  useEffect(() => {
+    spotifyApi.getPlaylist(playlistId).then((data) => {
+      setPlaylist(data?.body)
+    })
+  }, [spotifyApi, playlistId])
 
   return (
-    <div className="flex-grow text-white">
+    <div className="h-screen flex-grow overflow-y-scroll text-white scrollbar-hide">
       <header className="absolute top-5 right-8">
-        <div className="flex cursor-pointer items-center space-x-3 rounded-full bg-black p-1 pr-2 opacity-90 hover:opacity-80">
+        <div
+          className="flex cursor-pointer items-center space-x-3 rounded-full bg-black p-1 pr-2 opacity-90 hover:opacity-80"
+          onClick={() => signOut()}
+        >
           <img
-            src={session?.user?.image}
+            src={session?.user?.image as string}
             alt="avatar"
             className="w-190 h-10 rounded-full"
           />
@@ -37,8 +54,22 @@ export const Center = () => {
       </header>
 
       <section
-        className={`padding-8 flex h-80 items-end space-x-2 bg-gradient-to-b to-black ${color}`}
-      ></section>
+        className={`flex h-80 items-end space-x-7 bg-gradient-to-b to-black p-8 ${color}`}
+      >
+        <img
+          src={playlist?.images?.at(0)?.url}
+          alt={playlist?.name}
+          className="h-44 w-44 shadow-2xl"
+        />
+        <div>
+          <p>PLAYLIST</p>
+          <h1 className="text-2xl font-bold md:text-3xl xl:text-5xl">
+            {playlist?.name}
+          </h1>
+        </div>
+      </section>
+
+      <Songs />
     </div>
   )
 }
