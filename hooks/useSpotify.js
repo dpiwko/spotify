@@ -7,7 +7,7 @@ const spotifyApi = new SpotifyWebApi({
   clientSecret: process.env.NEXT_PUBLIC_CLIENT_SECRET,
 })
 
-export const useSpotify = () => {
+export default function useSpotify() {
   const { data: session } = useSession()
 
   useEffect(() => {

@@ -4,7 +4,7 @@ import { signOut, useSession } from 'next-auth/react'
 import { useEffect, useState } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'
 import { playlistIdState, playlistState } from '../atoms/playlistAtom'
-import { useSpotify } from '../hooks/useSpotify'
+import useSpotify from '../hooks/useSpotify'
 import Songs from './Songs'
 
 const colors = [
@@ -37,7 +37,7 @@ export default function Center() {
   }, [spotifyApi, playlistId])
 
   return (
-    <div className="h-screen flex-grow overflow-y-scroll text-white scrollbar-hide">
+    <div className="relative h-screen flex-grow overflow-y-scroll text-white scrollbar-hide">
       <header className="absolute top-5 right-8">
         <div
           className="flex cursor-pointer items-center space-x-3 rounded-full bg-black p-1 pr-2 opacity-90 hover:opacity-80"
@@ -54,16 +54,16 @@ export default function Center() {
       </header>
 
       <section
-        className={`flex h-80 items-end space-x-7 bg-gradient-to-b to-black p-8 ${color}`}
+        className={`flex h-80 items-end space-x-7 bg-gradient-to-b to-black p-8 pb-12 ${color}`}
       >
         <img
           src={playlist?.images?.at(0)?.url}
           alt={playlist?.name}
-          className="h-44 w-44 shadow-2xl"
+          className="h-52 w-52 shadow-2xl"
         />
         <div>
           <p>PLAYLIST</p>
-          <h1 className="text-2xl font-bold md:text-3xl xl:text-5xl">
+          <h1 className="mt-4 text-3xl font-bold md:text-6xl xl:text-9xl">
             {playlist?.name}
           </h1>
         </div>

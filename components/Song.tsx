@@ -1,25 +1,28 @@
-import { useRecoilState } from 'recoil'
+import { useSetRecoilState } from 'recoil'
 import { currentTrackIdState, isPlayingState } from '../atoms/songAtom'
-import { useSpotify } from '../hooks/useSpotify'
+import useSpotify from '../hooks/useSpotify'
 import { millisToMinutesAndSeconds } from '../lib/trackTime'
 
 interface ISong {
   order: number
   track: SpotifyApi.TrackObjectFull
+  playlist?: SpotifyApi.PlaylistTrackObject[]
 }
 
-export default function Song({ order, track }: ISong) {
+export default function Song({ order, track, playlist }: ISong) {
   const spotifyApi = useSpotify()
-  const [currentTrackId, setCurrentTrackId] =
-    useRecoilState(currentTrackIdState)
-  const [isPlaying, setIsPlaying] = useRecoilState(isPlayingState)
+  const setCurrentTrackId = useSetRecoilState(currentTrackIdState)
+  const setIsPlaying = useSetRecoilState(isPlayingState)
+
+  const playlistTracks = playlist?.map(({ track }) => track.uri)
 
   const playSong = () => {
     setCurrentTrackId(track.id)
     setIsPlaying(true)
 
     spotifyApi.play({
-      uris: [track.uri],
+      uris: playlistTracks || [track.uri],
+      offset: { position: order },
     })
   }
 
@@ -37,7 +40,9 @@ export default function Song({ order, track }: ISong) {
         />
         <div>
           <p className="w-36 truncate text-white lg:w-64">{track.name}</p>
-          <p className="w-40">{track.artists?.at(0)?.name}</p>
+          <p className="w-36 truncate lg:w-64">
+            {track?.artists?.map((artist) => artist.name).join(', ')}
+          </p>
         </div>
       </div>
 
